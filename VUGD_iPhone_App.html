@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+    <title>VUGD Pārbaudes Testi</title>
+    
+    <style>
+        .option-btn { transition: all 0.2s ease-in-out; }
+        .option-btn:hover:not(:disabled) { transform: translateY(-2px); }
+    </style>
+
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f2f4f8;
+  --card:#ffffff;
+  --text:#172033;
+  --muted:#6b7280;
+  --accent:#d92d20;
+  --accent-dark:#b42318;
+  --line:#e5e7eb;
+  --good:#087443;
+  --bad:#b42318;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{padding-bottom:env(safe-area-inset-bottom)}
+button{font:inherit;touch-action:manipulation;cursor:pointer}
+button:focus-visible{outline:3px solid #2563eb;outline-offset:3px}
+header{background:linear-gradient(135deg,#991b1b,#dc2626)!important;color:white!important;padding:22px 16px!important;border-radius:0 0 26px 26px;box-shadow:0 5px 18px rgba(127,29,29,.22)}
+main{max-width:720px!important;width:100%;margin:0 auto;padding:14px!important}
+.card,.question-card,.bg-white{background:var(--card);border:1px solid rgba(15,23,42,.06);border-radius:22px;padding:18px;margin:12px 0;box-shadow:0 5px 18px rgba(15,23,42,.06)}
+button{border-radius:16px!important;min-height:52px!important;padding:12px 16px!important;font-weight:700!important}
+button:active{transform:scale(.985)}
+.option,.answer-option,[class*="option"]{width:100%;min-height:60px!important;text-align:left!important;white-space:normal!important;line-height:1.35!important;margin:9px 0!important;border:1px solid var(--line)!important;background:#fff!important;color:var(--text)!important}
+.option:hover,.answer-option:hover,[class*="option"]:hover{border-color:#ef4444!important;background:#fff7f7!important}
+h1{font-size:clamp(24px,7vw,38px)!important;line-height:1.12!important}
+h2{font-size:clamp(20px,5.5vw,28px)!important;line-height:1.2!important}
+h3{font-size:clamp(17px,4.8vw,23px)!important}
+p{overflow-wrap:anywhere}
+input,select{max-width:100%;font-size:16px!important}
+.progress,.progress-bar{border-radius:999px!important}
+@media(max-width:600px){
+  main{padding:9px!important}
+  header{padding:20px 14px!important}
+  .grid{grid-template-columns:1fr!important}
+  .flex{flex-wrap:wrap}
+  .option,.answer-option,[class*="option"]{font-size:17px!important;min-height:64px!important;padding:15px!important}
+  .card,.question-card,.bg-white{padding:15px!important;border-radius:19px}
+}
+</style>
+
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="bg-red-700 text-white shadow-md">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+                <span>🚒</span> VUGD Zināšanu Testēšanas Lietotne
+            </h1>
+            <span id="quiz-mode-badge" class="bg-red-800 text-xs md:text-sm px-3 py-1 rounded-full border border-red-500 hidden">
+                Gatavs
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl mx-auto px-4 py-6 w-full flex-grow flex flex-col justify-center">
+
+        <!-- Welcome / Mode Selection Screen -->
+        <div id="start-screen" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 text-center border border-slate-200">
+            <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-4">Sagatavošanās VUGD Pārbaudījumam</h2>
+            <p class="text-slate-600 mb-8 max-w-2xl mx-auto">
+                Lietotnē ir iekļauti visi 104 jautājumi ar pareizajām atbildēm. Katru reizi uzsākot testu, jautājumu un atbilžu secība tiek nejauši samaisīta.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <button onclick="startQuiz('all')" class="p-5 border-2 border-red-600 rounded-xl hover:bg-red-50 text-left transition group">
+                    <div class="text-red-600 text-2xl mb-2 group-hover:scale-110 transition-transform">📚</div>
+                    <div class="font-bold text-lg text-slate-900">Pilnais tests</div>
+                    <div class="text-sm text-slate-500 mt-1">Visi 104 jautājumi. Pilna apmācība un zināšanu pārbaude.</div>
+                </button>
+
+                <button onclick="startQuiz('express')" class="p-5 border-2 border-blue-600 rounded-xl hover:bg-blue-50 text-left transition group">
+                    <div class="text-blue-600 text-2xl mb-2 group-hover:scale-110 transition-transform">⚡</div>
+                    <div class="font-bold text-lg text-slate-900">Ekspress tests</div>
+                    <div class="text-sm text-slate-500 mt-1">20 nejauši izvēlēti jautājumi ātrai atkārtošanai.</div>
+                </button>
+
+                <button onclick="startQuiz('rules')" class="p-5 border-2 border-emerald-600 rounded-xl hover:bg-emerald-50 text-left transition group">
+                    <div class="text-emerald-600 text-2xl mb-2 group-hover:scale-110 transition-transform">👔</div>
+                    <div class="font-bold text-lg text-slate-900">Dienesta attiecības</div>
+                    <div class="text-sm text-slate-500 mt-1">Jautājumi par ārējo izskatu un dienesta kārtību.</div>
+                </button>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800 text-left flex items-start gap-3">
+                <span class="text-lg">💡</span>
+                <div>
+                    <strong>Piezīme:</strong> Lai nokārtotu ikmēneša zināšanu pārbaudi VUGD, ir nepieciešams sasniegt vismaz <strong>80%</strong> pareizu atbilžu.
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden flex-col gap-4">
+            <!-- Progress and Stats -->
+            <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="w-full md:w-2/3">
+                    <div class="flex justify-between text-sm font-semibold text-slate-600 mb-1">
+                        <span id="progress-text">Jautājums 1 no 104</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-3">
+                        <div id="progress-bar" class="bg-red-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 text-sm font-bold">
+                    <span class="text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200" id="score-correct">Pareizi: 0</span>
+                    <span class="text-rose-600 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-200" id="score-incorrect">Nepareizi: 0</span>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-slate-200">
+                <div class="mb-6">
+                    <span id="question-number-badge" class="inline-block bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded mb-2">#1</span>
+                    <h3 id="question-text" class="text-lg md:text-xl font-bold text-slate-900 leading-relaxed">
+                        Jautājums...
+                    </h3>
+                </div>
+
+                <!-- Answer Options -->
+                <div id="options-container" class="grid grid-cols-1 gap-3 mb-6"></div>
+
+                <!-- Feedback Box -->
+                <div id="feedback-box" class="hidden p-4 rounded-xl text-sm font-medium border mb-4">
+                    <div id="feedback-status" class="font-bold text-base mb-1"></div>
+                    <div id="feedback-text"></div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex justify-between items-center pt-2">
+                    <button onclick="confirmExit()" class="text-slate-500 hover:text-slate-700 text-sm font-semibold px-3 py-2 rounded">
+                        ← Atstāt testu
+                    </button>
+                    <button id="next-btn" onclick="nextQuestion()" disabled class="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold px-6 py-2.5 rounded-xl shadow transition">
+                        Nākamais jautājums →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-8 text-center border border-slate-200">
+            <div id="result-icon" class="text-6xl mb-4">🎉</div>
+            <h2 id="result-title" class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2">Tests pabeigts!</h2>
+            <p id="result-subtitle" class="text-slate-600 mb-6">Šeit ir jūsu pārbaudes rezultāti:</p>
+
+            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 max-w-sm mx-auto mb-6">
+                <div class="text-5xl font-black mb-2" id="result-percentage">0%</div>
+                <div class="text-sm font-semibold text-slate-500 mb-4" id="result-counts">0 pareizi no 0 jautājumiem</div>
+                <div id="result-pass-badge" class="inline-block px-4 py-1.5 rounded-full text-sm font-bold">-</div>
+            </div>
+
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button onclick="restartCurrentQuiz()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl shadow transition">
+                    Mēģināt vēlreiz 🔄
+                </button>
+                <button onclick="showStartScreen()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-6 py-3 rounded-xl transition">
+                    Galvenā izvēlne
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-slate-200 border-t border-slate-300 py-4 text-center text-xs text-slate-600">
+        VUGD Mācību materiāls (104 jautājumi ar atbildēm). Izstrādāts dienesta pārbaudījumu sagatavošanai.
+    </footer>
+
+    <script>
+        const questionsDB = [
+            { id: 1, q: "Cik ātri jāpaziņo tiešajam komandierim vai priekšniekam par darbnespējas iestāšanos slimības dēļ, kā arī citu prombūtnes gadījuma iemeslu?", correct: "Pēc iespējas ātrāk.", wrong: ["Ne vēlāk kā 24 stundu laikā.", "Trīs darba dienu laikā.", "Nākamās maiņas sākumā."] },
+            { id: 2, q: "Cik bieži amatpersonu ar speciālo dienesta pakāpi nosūta uz Medicīniskās ekspertīzes komisiju, lai pārbaudītu veselības stāvokļa atbilstību dienestam?", correct: "Reizi gadā.", wrong: ["Reizi 3 gados.", "Reizi 5 gados.", "Tikai pēc ilgstošas slimošanas."] },
+            { id: 3, q: "Cik bieži pārbauda amatpersonas fiziskās sagatavotības atbilstību?", correct: "Ne retāk kā reizi gadā.", wrong: ["Reizi pusgadā.", "Divas reizes gadā.", "Reizi trijos gados."] },
+            { id: 4, q: "Cik ilgā laikā republikas pilsētā, pilsētā un ciemā, kur atrodas VUGD daļa vai postenis, apakšvienība ierodas notikuma vietā pēc izbraukšanas?", correct: "8 minūtēs.", wrong: ["5 minūtēs.", "10 minūtēs.", "15 minūtēs."] },
+            { id: 5, q: "Cik ilgā laikā VUGD apakšvienībai jāizbrauc no daļas vai posteņa garāžas pēc izsaukuma saņemšanas?", correct: "Ne vēlāk kā 90 sekundēs.", wrong: ["Ne vēlāk kā 60 sekundēs.", "Ne vēlāk kā 120 sekundēs.", "Ne vēlāk kā 3 minūtēs."] },
+            { id: 6, q: "Cik lielu piemaksu saņem amatpersonas (darbinieki) par nakts darbu?", correct: "50 procentu apmērā no noteiktās stundas algas likmes.", wrong: ["25 procentu apmērā no noteiktās stundas algas likmes.", "75 procentu apmērā no noteiktās stundas algas likmes.", "100 procentu apmērā no noteiktās stundas algas likmes."] },
+            { id: 7, q: "Cik procentiem atbilžu jābūt pareizām, lai ikmēneša zināšanu pārbaudē iegūtu vērtējumu “ieskaitīts”?", correct: "Vismaz 80 procentiem.", wrong: ["Vismaz 70 procentiem.", "Vismaz 85 procentiem.", "Vismaz 90 procentiem."] },
+            { id: 8, q: "Kā rīkojas teritoriālās struktūrvienības ugunsdzēsējs glābējs, ja vēlas strādāt arī citā darbavietā?", correct: "Saņem rakstveida atļauju amatu savienošanai noteiktajā kārtībā.", wrong: ["Iesniedz tikai mutisku paziņojumu tiešajam priekšniekam.", "Rakstveidā informē Valsts darba inspekciju.", "Mācību iestādēs drīkst strādāt bez saskaņošanas."] },
+            { id: 9, q: "Kā sveicina priekšniekus vai vecākās amatpersonas, tiem ienākot telpās?", correct: "Pieceļoties; apsēžas pēc priekšnieka vai vecākās amatpersonas atļaujas.", wrong: ["Ar roku mājienu, neatraujoties no darba.", "Pieliekot roku pie cepures naga sēdus stāvoklī.", "Skaļi nosaucot savu uzvārdu un amatu."] },
+            { id: 10, q: "Kā veic ugunsgrēku dzēšanu un glābšanas darbus īpašos objektos?", correct: "Saskaņojot ar attiecīgā objekta vadītāju vai citu atbildīgo amatpersonu.", wrong: ["Tikai pēc Aizsardzības ministrijas rīkojuma.", "Pilnīgi patstāvīgi, ignorējot objekta personālu.", "Gaidot specializētās drošības dienesta vienības."] },
+            { id: 11, q: "Kad amatpersonai nav atļauts nodot asinis?", correct: "Dienesta pienākumu izpildes laikā un mazāk nekā 24 stundas pirms dienesta pienākumu izpildes sākuma.", wrong: ["Brīvdienās un ikgadējā atvaļinājuma laikā.", "Mazāk nekā 12 stundas pirms dežūras sākuma.", "Jebkurā darba dienā pēcpusdienā."] },
+            { id: 12, q: "Kad piešķir kaprāļa speciālo dienesta pakāpi?", correct: "Kad amatpersona ir ieguvusi amatam nepieciešamo profesionālo izglītību un atbilst pārējiem dienesta gaitas nosacījumiem.", wrong: ["Automātiski pēc 6 mēnešu nodienēšanas.", "Tikai pēc komandējošā sastāva eksāmena nokārtošanas.", "Pēc 3 gadu dienesta bez disciplinārsodiem."] },
+            { id: 13, q: "Kad paredzēta tehnikas, aprīkojuma, depo telpu un teritorijas sagatavošana dežūras nodošanai?", correct: "No plkst. 7.00 līdz 8.00.", wrong: ["No plkst. 6.00 līdz 7.00.", "No plkst. 8.00 līdz 9.00.", "No plkst. 22.00 līdz 23.00."] },
+            { id: 14, q: "Kā rīkojas augstāka amatpersona, ja ir aizdomas, ka amatpersona dienesta laikā ir apreibinošu vielu ietekmē?", correct: "Atstādina no dienesta pienākumu izpildes un nodrošina pārbaudes veikšanu noteiktajā kārtībā.", wrong: ["Izsaka rakstveida piezīmi un ļauj turpināt dežūru.", "Nosūta mājās atpūsties līdz nākamajai maiņai.", "Uzliek naudas sodu un turpina dienestu."] },
+            { id: 15, q: "Kad dežūrā noteikts gaidīšanas režīms?", correct: "No plkst. 23.00 līdz 6.00.", wrong: ["No plkst. 22.00 līdz 7.00.", "No plkst. 00.00 līdz 6.00.", "No plkst. 21.00 līdz 8.00."] },
+            { id: 16, q: "Kā kompensē darbu virs noteiktā darba laika, ja tas nebija steidzams, iepriekš neparedzēts uzdevums?", correct: "Piešķir apmaksātu atpūtas laiku, kas atbilst nostrādātajam virsstundu skaitam.", wrong: ["Maksā dubultu stundas likmi par visām stundām.", "Pievieno dienas pie ikgadējā atvaļinājuma dubultā apmērā.", "Kompensācija nav paredzēta."] },
+            { id: 17, q: "Kādas iestādes vai dienestus nevar iesaistīt ugunsdzēsības un glābšanas darbos?", correct: "Nevar iesaistīt iestādi, kurai normatīvajos aktos nav noteiktas ar konkrēto neatliekamo pasākumu saistītas funkcijas.", wrong: ["Valsts policiju un pašvaldības policiju.", "NMPD un Valsts vides dienestu.", "Gāzes un elektrotīklu avārijas dienestus."] },
+            { id: 18, q: "Kāds lietošanas ilgums noteikts ugunsdzēsēja glābēja dežūrformai — virskreklam un biksēm?", correct: "Viens gads.", wrong: ["6 mēneši.", "Divi gadi.", "Trīs gadi."] },
+            { id: 19, q: "Kāds varētu būt pamatojums amatpersonas atvaļināšanai no dienesta?", correct: "Veselības stāvokļa neatbilstība dienestam, ja to noteikusi kompetentā medicīniskā komisija.", wrong: ["Personīga vēlēšanās mainīt dzīvesvietu.", "Ikmēneša zināšanu pārbaudes nenokārtošana ar pirmo reizi.", "Dienesta pakāpes paaugstināšanas kavēšanās."] },
+            { id: 20, q: "Kam obligāti jāpilda ugunsgrēka dzēšanas un glābšanas darbu vadītāja rīkojumi notikuma vietā?", correct: "Visām personām, kuras atrodas ugunsdzēsības vai glābšanas darbu veikšanas vietā.", wrong: ["Tikai VUGD amatpersonām un darbiniekiem.", "Tikai operatīvo dienestu darbiniekiem.", "Tikai ēkas īpašniekam un īrniekiem."] },
+            { id: 21, q: "Kam ir tiesības atsaukt ugunsdzēsēju glābēju no atvaļinājuma?", correct: "Iestādes vadītājam vai viņa pilnvarotai amatpersonai.", wrong: ["Tiešajam maiņas komandierim.", "Iekšlietu ministram personīgi.", "Tikai pašai amatpersonai pēc paša vēlēšanās."] },
+            { id: 22, q: "Kam ir tiesības iejaukties darbu vadītāja darbībā un atcelt viņa likumīgos rīkojumus?", correct: "Nevienam.", wrong: ["Tikai VUGD priekšniekam.", "Iekšlietu ministram.", "Objekta īpašniekam un Valsts policijai."] },
+            { id: 23, q: "Kas aizliegts nodarbinātajam dienesta pienākumu izpildes laikā un vietā?", correct: "Atrasties alkohola, narkotisko, psihotropo, toksisko vai citu apreibinošu vielu ietekmē, kā arī tās lietot.", wrong: ["Lietot uzturā karstu ēdienu un bezalkoholiskos dzērienus.", "Klausīties radio gaidīšanas režīmā.", "Izmantot personalizētus mācību līdzekļus."] },
+            { id: 24, q: "Kas ir tiesīgs atvaļināt ugunsdzēsēju glābēju no dienesta?", correct: "Amatpersona, kura ir tiesīga iecelt attiecīgajā amatā.", wrong: ["Depo postenis komandieris.", "Tiešais maiņas priekšnieks.", "Tikai tiesa ar īpašu lēmumu."] },
+            { id: 25, q: "Kas izbrauc uz notikuma vietu, ja plkst. 8.00 sakaru punkta dežurants signalizē par izbraukumu?", correct: "Dežūru pieņemošā (ienākošā) dežūrmaiņa.", wrong: ["Dežūru nododošā (izejošā) dežūrmaiņa.", "Abas dežūrmaiņas pilnā sastāvā.", "Ienākošās maiņas komandieris viens pats."] },
+            { id: 26, q: "Kas dienas kārtībā paredzēts no plkst. 9.30 līdz 11.00?", correct: "Ugunsdzēsības tehnikas, ugunsdzēsības un glābšanas aprīkojuma pārbaude, apkope vai remonts un saimnieciskie darbi.", wrong: ["Gaidīšanas režīms un personīgā atpūta.", "Sporta nodarbības un fiziskās sagatavotības normatīvi.", "Tehnikas sagatavošana dežūras nodošanai."] },
+            { id: 27, q: "Kas vada ugunsgrēka ierobežošanas un likvidācijas darbus mežā un meža zemēs?", correct: "Valsts meža dienesta amatpersona.", wrong: ["VUGD daļas komandieris.", "Zemessardzes pārstāvis.", "Vietējās pašvaldības vadītājs."] },
+            { id: 28, q: "Ko amatpersona atbild pēc mutiska rīkojuma saņemšanas?", correct: "“Klausos!”", wrong: ["“Sapratu!”", "“Izpildīšu!”", "“Jā, priekšnieka kungs!”"] },
+            { id: 29, q: "Ko dara amatpersona, ienākot priekšnieka telpās?", correct: "Jautā: “Atļausiet ienākt?”", wrong: ["Atver durvis un ieņem pamatstāju.", "Uzreiz ziņo par ierašanās iemeslu.", "Apsēžas uz tuvākā krēsla."] },
+            { id: 30, q: "Kurš ir ugunsgrēka dzēšanas un glābšanas darbu vadītājs, kad notikuma vietā ierodas VUGD apakšvienība?", correct: "VUGD amatpersona ar speciālo dienesta pakāpi, kura ir pilnvarota vadīt darbus atbilstoši VUGD noteiktajai kārtībai.", wrong: ["Ekspluatācijas īpašnieks vai īrnieks.", "Vecākais Valsts policijas darbinieks.", "NMPD brigādes vadītājs."] },
+            { id: 31, q: "Kurš sniedz pirmo palīdzību līdz NMPD brigādes ierašanās brīdim?", correct: "VUGD amatpersona ar speciālo dienesta pakāpi.", wrong: ["Tikai sertificēti medicīnas darbinieki.", "Cietušā radinieki vai aculiecinieki.", "Patvertnes atbildīgā persona."] },
+            { id: 32, q: "Līdz kādam datumam nodarbināto iepazīstina ar nākamā mēneša darba grafiku?", correct: "Līdz kārtējā mēneša pēdējam kalendāra datumam.", wrong: ["Līdz katra mēneša 15. datumam.", "Līdz kārtējā mēneša 25. datumam.", "Nākamā mēneša pirmajā darba dienā."] },
+            { id: 33, q: "Ne vairāk kā uz cik daļām var sadalīt ikgadējo apmaksāto atvaļinājumu?", correct: "Divās daļās.", wrong: ["Trīs daļās.", "Četrās daļās.", "Atvaļinājumu sadalīt nav atļauts."] },
+            { id: 34, q: "Uz cik ilgu laiku norīko dieninieku?", correct: "Ne ilgāk kā uz divām stundām pēc kārtas.", wrong: ["Ne ilgāk kā uz vienu stundu.", "Uz 4 stundām pēc kārtas.", "Uz visu 24 stundu dežūru."] },
+            { id: 35, q: "Uz kādu laiku var pārcelt ikgadējā apmaksātā atvaļinājuma daļu?", correct: "Tikai uz nākamo gadu, tātad ne ilgāk kā uz vienu gadu.", wrong: ["Līdz trīs gadiem.", "Ne ilgāk kā uz 6 mēnešiem.", "Atvaļinājuma pārcelšana nav pieļaujama."] },
+            { id: 36, q: "Vai VUGD amatpersona, pildot dienesta pienākumus atbilstoši pilnvarām, atbild par nodarīto mantisko un fizisko kaitējumu?", correct: "Nē, neatbild, ja rīkojusies atbilstoši normatīvajos aktos noteiktajām pilnvarām.", wrong: ["Jā, vienmēr pilnā apmērā no saviem līdzekļiem.", "Jā, bet tikai par mantisko kaitējumu.", "Atbild tikai tad, ja kaitējums nodarīts valsts mantai."] },
+            { id: 37, q: "Vai amatpersonai ir tiesības atteikties pildīt priekšnieka dotos uzdevumus?", correct: "Likumīgs rīkojums ir jāpilda. Par acīmredzami prettiesisku rīkojumu rakstiski ziņo tā devējam vai augstākam priekšniekam.", wrong: ["Jā, ja uzdevums neatbilst personīgajiem ieskatiem.", "Jā, ja tas prasa strādāt ārpus darba laika.", "Nē, jebkurš rīkojums ir jāizpilda bez iebildumiem un ziņošanas."] },
+            { id: 38, q: "Vai atļauts nēsāt rotaslietas vai citus priekšmetus redzamās ķermeņa vietās, piemēram, degunā, uzacīs, lūpās vai mēlē?", correct: "Nē, aizliegts.", wrong: ["Jā, ja tās ir neuzkrītošas.", "Jā, ar tiešā priekšnieka rakstisku atļauju.", "Atļauts tikai sievietēm."] },
+            { id: 39, q: "Vai atļauts smēķēt specializētajā transportlīdzeklī?", correct: "Nē, nav atļauts.", wrong: ["Jā, ja transportlīdzeklis nestāv rindā.", "Jā, ar vadītāja atļauju.", "Jā, ja izsaukums nav operatīvs."] },
+            { id: 40, q: "Vai disciplinārsoda lēmuma apstrīdēšana vai pārsūdzēšana aptur tā izpildi?", correct: "Nē, neaptur.", wrong: ["Jā, aptur līdz galīgajam lēmumam.", "Aptur tikai tad, ja tas ir atvaļināšana no dienesta.", "Aptur uz 10 darba dienām."] },
+            { id: 41, q: "Vai jāinformē priekšnieks par neplānotu privātu izceļošanu uz ārvalstīm?", correct: "Jā; jāinformē un noteiktajā kārtībā jāiesniedz ziņojums par izceļošanu.", wrong: ["Nē, par neplānotiem braucieniem nav jāinformē.", "Tikai tad, ja izceļo ārpus Eiropas Savienības.", "Informē tikai pēc atgriešanās no ārvalstīm."] },
+            { id: 42, q: "Vai jāinformē priekšnieks par plānotu privātu izceļošanu uz ārvalstīm?", correct: "Jā, priekšnieks jāinformē pirms izceļošanas noteiktajā kārtībā.", wrong: ["Nē, tas skar tikai dienesta komandējumus.", "Tikai gadījumā, ja tas sakrīt ar dežūras dienu.", "Jā, bet tikai tad, ja izceļo ilgāk par 14 dienām."] },
+            { id: 43, q: "Vai ugunsdzēsēji var izmantot objekta resursus?", correct: "Jā. Darbu vadītājs var bez atlīdzības iesaistīt objektā esošos tehniskos resursus.", wrong: ["Nē, tas ir stingri aizliegts.", "Jā, bet tikai par iepriekš saskaņotu samaksu.", "Tikai ar tiesas atļauju."] },
+            { id: 44, q: "Vai darbu vadītājs drīkst dot rīkojumu nojaukt būves, lai ierobežotu ugunsgrēka izplatīšanos?", correct: "Jā, drīkst arī bez īpašnieka vai valdītāja piekrišanas, ja tas nepieciešams likumā noteiktā mērķa sasniegšanai.", wrong: ["Nē, bez īpašnieka rakstiskas piekrišanas to darīt aizliegts.", "Tikai ar pašvaldības būvvaldes saskaņojumu.", "Jā, bet tikai pēc ugunsgrēka pilnīgas likvidēšanas."] },
+            { id: 45, q: "Vai VUGD piedalās politisko vai starpnacionālo konfliktu novēršanas un masu nekārtību likvidācijas pasākumos?", correct: "Nē, izņemot ar masu nekārtību novēršanu saistītus ugunsdzēsības un glābšanas darbus.", wrong: ["Jā, pilnā apmērā kopā ar Valsts policiju.", "Jā, ja to pieprasa pašvaldība.", "Nē, nekādos apstākļos."] },
+            { id: 46, q: "Kuri noteikumi nosaka amatpersonu formas tērpā savstarpējo dienesta attiecību kārtību un ārējo izskatu?", correct: "Iekšlietu ministrijas iekšējie noteikumi Nr. 34.", wrong: ["MK Noteikumi Nr. 560.", "Ugunsdrošības un ugunsdzēsības likums.", "VUGD Iekšējās kārtības rullis Nr. 1."] },
+            { id: 47, q: "Kāds ir šo noteikumu mērķis?", correct: "Veicināt vienvadības principa nostiprināšanu, amatpersonu disciplīnu un vienotas iekšējās kārtības nodrošināšanu.", wrong: ["Paaugstināt fiziskās sagatavotības līmeni.", "Nodrošināt starptautisko sadarbību glābšanas darbos.", "Regulēt darba samaksas un piemaksu apmērus."] },
+            { id: 48, q: "Kas ir augstāks priekšnieks?", correct: "Priekšnieks, kuram amatpersona pakļauta pastarpināti.", wrong: ["Tiešais maiņas komandieris.", "Amatpersona ar ilgāku dienesta stāžu.", "Depo priekšnieka vietnieks."] },
+            { id: 49, q: "Kas ir priekšnieks?", correct: "Amatpersona, kuras pakļautībā dienesta pienākumus pilda citas amatpersonas.", wrong: ["Jebkura amatpersona ar virsnieka pakāpi.", "Instruktors ar vislielāko pieredzi.", "Iestādes vecākais grāmatvedis."] },
+            { id: 50, q: "Kas ir tiešais priekšnieks?", correct: "Priekšnieks, kuram amatpersona ir tieši pakļauta.", wrong: ["Dežūrmaiņas vecākais vadītājs.", "VUGD priekšnieka vietnieks.", "Priekšnieks, kuram amatpersona pakļauta pastarpināti."] },
+            { id: 51, q: "Kas ir vecāka amatpersona?", correct: "Amatpersona ar augstāku speciālo dienesta pakāpi.", wrong: ["Amatpersona, kas ir vecāka par 45 gadiem.", "Amatpersona ar ilgāku dienesta stāžu VUGD.", "Tiešais struktūrvienības vadītājs."] },
+            { id: 52, q: "Kas ir jaunāka amatpersona?", correct: "Amatpersona ar zemāku speciālo dienesta pakāpi.", wrong: ["Amatpersona vecumā līdz 25 gadiem.", "Amatpersona ar mazāku darba pieredzi.", "Jaunuzņemts klients vai kursants."] },
+            { id: 53, q: "Kas ir padotais?", correct: "Amatpersona, kura pakļauta priekšniekam.", wrong: ["Amatpersona ar zemāko izglītības līmeni.", "Brīvprātīgais ugunsdzēsējs.", "Dežūrmaiņas jaunākais šoferis."] },
+            { id: 54, q: "Kas ir oficiāls sveiciens?", correct: "Amatpersona formas tērpā pieliek labo roku pie galvassegas tā, lai vidējais pirksts pieskartos cepures naga sākumam labajā pusē.", wrong: ["Rokas spiediens un vārdisks sveiciens.", "Galvas mājiens, stāvot mierā.", "Kreisās rokas pacelšana plecu līmenī."] },
+            { id: 55, q: "Uz ko attiecina komandas “Mierā!” un “Brīvi!”?", correct: "Uz visām amatpersonām.", wrong: ["Tikai uz ierindā esošajiem instruktoriem.", "Tikai uz virsniekiem.", "Tikai uz kursantiem un kadetiem."] },
+            { id: 56, q: "Uz ko attiecina komandu “Virsnieki!”?", correct: "Uz amatpersonām, kurām dienesta pakāpe ir leitnants vai augstāka.", wrong: ["Uz visām amatpersonām no kaprāļa pakāpes.", "Tikai uz iestādes un struktūrvienību vadītājiem.", "Uz amatpersonām ar kapteiņa pakāpi."] },
+            { id: 57, q: "Kāds ir priekšnieku un vecāko amatpersonu pienākums un tiesības?", correct: "Aizrādīt un prasīt padotajiem un jaunākajām amatpersonām ievērot formas tērpa ārējā izskata noteikumus.", wrong: ["Nolikvidēt neuzkrītošas rotaslietas uz vietas.", "Sodīt ar naudas sodu par noteikumu pārkāpumu.", "Pārvietot padoto citā amatam bez saskaņošanas."] },
+            { id: 58, q: "Kam amatpersona pakļaujas, pildot dienesta pienākumus?", correct: "Tiešajam priekšniekam un pakļautības kārtībā augstākam priekšniekam.", wrong: ["Tikai VUGD priekšniekam.", "Jebkurai vecākai amatpersonai pilsētā.", "Tikai savas maiņas komandierim."] },
+            { id: 59, q: "Pie kā amatpersona vēršas ar dienestu saistītos jautājumos, ja tie nav neatliekami?", correct: "Pie tiešā priekšnieka; ar viņa atļauju pakļautības kārtībā var vērsties pie augstāka priekšnieka.", wrong: ["Uzreiz pie VUGD priekšnieka.", "Tikai pie arodbiedrības pārstāvja.", "Pie Iekšlietu ministrijas kancelejas."] },
+            { id: 60, q: "Kas jādara, ja augstāks priekšnieks dod rīkojumu bez tiešā priekšnieka starpniecības?", correct: "Pēc rīkojuma saņemšanas par to nekavējoties jāziņo savam tiešajam priekšniekam.", wrong: ["Rīkojums nav jāpilda, līdz to neapstiprina tiešais priekšnieks.", "Rīkojums jāizpilda klusējot un nekādam nav jāziņo.", "Jāpieprasa rakstveida apstiprinājums no IeM."] },
+            { id: 61, q: "Vai atšķirīgs viedoklis ir iemesls likumīga rīkojuma nepildīšanai?", correct: "Nē, nav.", wrong: ["Jā, ja tas ir pamatots ar personīgo pieredzi.", "Jā, ja amatpersonai ir augstāka izglītība.", "Jā, ja par to paziņo rakstiski 24h laikā."] },
+            { id: 62, q: "Ko amatpersona atbild pēc mutiska rīkojuma saņemšanas?", correct: "“Klausos!”", wrong: ["“Sapratu, priekšnieka kungs!”", "“Izpildīšu!”", "“Labi!”"] },
+            { id: 63, q: "Kas jādara, ja saņemts mutisks aizrādījums no augstāka priekšnieka?", correct: "Par to nekavējoties mutiski jāinformē tiešais priekšnieks.", wrong: ["Jāiesniedz rakstveida paskaidrojums IeM.", "Tas nav jāizplata tālāk.", "Jāpieprasa atvainošanās."] },
+            { id: 64, q: "Kādu vārdu pēc dienesta pakāpes nosaukšanas lieto, vēršoties pie priekšnieka vai vecākas amatpersonas?", correct: "“Kungs” vai “kundze”.", wrong: ["“Biedrs” vai “biedrene”.", "“Priekšnieks” vai “vadītāja”.", "Tikai vārdu un uzvārdu."] },
+            { id: 65, q: "Kad amatpersona ieņem pamatstāju?", correct: "Ja tas atbilst situācijai: dodot vai saņemot rīkojumu, izsakot vai uzklausot aizrādījumu, apsveicot u.c.", wrong: ["Tikai svinīgo pasākumu un parāžu laikā.", "Katru reizi, kad telpā ienāk jebkurš kolēģis.", "Tikai atrodoties ierindā ārā."] },
+            { id: 66, q: "Kā sveicina priekšnieku vai vecāku amatpersonu, tai ienākot telpā?", correct: "Pieceļoties; apsēžas pēc saņemtas atļaujas.", wrong: ["Padodot roku un nosaucot savu amatu.", "Pieliekot roku pie cepures naga sēdus.", "Pagriežot galvu un pamājot ar roku."] },
+            { id: 67, q: "Ko jautā pēc sarunas ar priekšnieku, pirms iziet no telpas?", correct: "“Atļausiet iet?”", wrong: ["“Vai viss skaidrs?”", "“Varu būt brīvs?”", "“Uz redzēšanos!”"] },
+            { id: 68, q: "Kas jādara, ja augstāka priekšnieka klātbūtnē jāziņo tiešajam priekšniekam?", correct: "Atbilstoši situācijai jālūdz augstākā priekšnieka atļauja.", wrong: ["Jāziņo tiešajam priekšniekam, ignorējot augstāko.", "Jāziņo tikai augstākajam priekšniekam.", "Jāpagaida, līdz augstākais priekšnieks atstās telpu."] },
+            { id: 69, q: "Kā amatpersonas formas tērpā, kustībā ārpus ierindas un ārā viena otru sveicina?", correct: "Ar oficiālu sveicienu. Jaunākā amatpersona pirmā sveicina vecāko 3–4 soļu attālumā.", wrong: ["Ar rokas mājienu un galvas pagriezienu.", "Tikai ar vārdisku sveicienu.", "Nenesot galvassegu, sveicināties nav nepieciešams."] },
+            { id: 70, q: "Kā amatpersonas formas tērpā, ārpus ierindas, telpās viena otru sveicina?", correct: "Ar galvas pagriešanu un mājienu.", wrong: ["Pieliekot labo roku pie galvassegas.", "Tikai ar rokas spiedienu.", "Ar skaļu komandu “Mierā!”."] },
+            { id: 71, q: "Vai oficiālā sveicināšana attiecas arī uz ārvalstu amatpersonām un karavīriem formas tērpā?", correct: "Jā, attiecas.", wrong: ["Nē, attiecas tikai uz Latvijas IeM dienestiem.", "Tikai NATO dalībvalstu pārstāvjiem.", "Tikai tad, ja ir saņemts īpašs rīkojums."] },
+            { id: 72, q: "Vai jaunākā amatpersona pirmā oficiāli sveicina vecāko amatpersonu?", correct: "Jā, atrodoties 3–4 soļu attālumā.", wrong: ["Nē, vecākā amatpersona vienmēr sveicina pirmā.", "Jā, bet tikai atrodoties telpās.", "Vienlaicīgi, neatkarīgi no pakāpes."] },
+            { id: 73, q: "Kā, ejot bez galvassegas garām vecākajai amatpersonai, to sveicina?", correct: "3–4 soļu attālumā vienlaikus ar kreisās kājas soli nolaiž rokas gar sāniem un pagriež galvu uz sveicināmās amatpersonas pusi.", wrong: ["Pieliek labo plaukstu pie pieres.", "Apstājas, pagriežas un paklanās.", "Turpina ceļu, neskatoties uz viņu."] },
+            { id: 74, q: "Kā sveicina vecāko amatpersonu, ja galvā ir galvassega?", correct: "Ieņem pamatstāju, pagriežas pret sveicināmo amatpersonu, skatās tās virzienā un oficiāli sveicina.", wrong: ["Noņem galvassegu un tur to kreisajā rokā.", "Noliec galvu un atdod godu ar kreiso roku.", "Māj ar roku, nepārtraucot kustību."] },
+            { id: 75, q: "Kā, stāvot uz vietas bez galvassegas, sveicina vecāko amatpersonu?", correct: "Pagriežas pret sveicināmo amatpersonu, ieņem pamatstāju, skatās tieši uz viņu un ar galvu seko tās pārvietošanās virzienam.", wrong: ["Pieliek roku pie pieres.", "Nolaiž acis un paliek nekustīgs.", "Ieņem brīvu stāju."] },
+            { id: 76, q: "Kā sveicina, ja abās rokās ir priekšmeti, kas apgrūtina oficiālo sveicināšanu?", correct: "Tikai ar galvas pagriezienu.", wrong: ["Ar skaļu saucienu “Sveicinu!”", "Noliek priekšmetus zemē un dod oficiālo sveicienu.", "Vispār nesveicina."] },
+            { id: 77, q: "Ja sanāksmē vai telpā ierodas augstāks priekšnieks, kādu komandu dod?", correct: "“Mierā!” vai “Virsnieki!” atkarībā no klātesošajām amatpersonām.", wrong: ["“Uzmanību!”", "“Klausīties visi!”", "“Pamatstāja!”"] },
+            { id: 78, q: "Ko dara Latvijas valsts himnas atskaņošanas laikā?", correct: "Bez komandas “Mierā!” ieņem pamatstāju un dzied himnu. Ja galvā galvassega (ārpus ierindas) — oficiāli sveicina.", wrong: ["Nolej galvu un tur rokas aiz muguras.", "Apsēžas un klausās klusumā.", "Turpina pildīt iesāktos saimnieciskos darbus."] },
+            { id: 79, q: "Kādam jābūt formas tērpam?", correct: "Tīram, izgludinātam un sakārtotam; apaviem — notīrītiem un nospodrinātiem.", wrong: ["Tikai tīram, gludināšana nav obligāta.", "Atbilstošam jaunākajām modes tendencēm.", "Jaunam un nelietotam."] },
+            { id: 80, q: "Vai privātā apģērba elementus drīkst nēsāt kopā ar formas tērpu?", correct: "Nē, izņemot noteikumos īpaši atļautos gadījumus.", wrong: ["Jā, ja tie ir melnā vai tumši zilā krāsā.", "Jā, aukstā laikā zem virsjakas.", "Jā, jebkurā laikā."] },
+            { id: 81, q: "Vai, pārvietojoties formas tērpā, atļauts košļāt košļājamo gumiju?", correct: "Nē.", wrong: ["Jā, ja tas netraucē runāt.", "Jā, ārpus ierindas.", "Jā, ar dežūrkomandiera atļauju."] },
+            { id: 82, q: "Vai, pārvietojoties formas tērpā, atļauts smēķēt?", correct: "Nē; smēķēt drīkst tikai tam paredzētā vietā.", wrong: ["Jā, ja tuvumā nav priekšniecības.", "Jā, pārvietojoties kājām ārpus pilsētas.", "Jā, gaidot sabiedrisko transportu."] },
+            { id: 83, q: "Vai, pārvietojoties formas tērpā, atļauts zelēt tabaku?", correct: "Nē.", wrong: ["Jā, jo tā nerada dūmus.", "Jā, ārpus dienesta telpām.", "Jā, ar tiešā priekšnieka atļauju."] },
+            { id: 84, q: "Kādam jābūt vīriešu matu griezumam?", correct: "Koptam un dabīgā tonī; mati nedrīkst krist pāri uzacīm, ausīm vai apkaklei.", wrong: ["Matiem jābūt pilnībā noskūtiem.", "Garumam nav ierobežojumu, ja tie savākti astē.", "Jebkurā tonī, kas nepiesaista uzmanību."] },
+            { id: 85, q: "Vai vīriešiem atļauts matus pīt bizēs?", correct: "Nē.", wrong: ["Jā, ja tie netraucē ķiverei.", "Jā, ja tie nav garāki par pleciem.", "Jā, ar atļauju."] },
+            { id: 86, q: "Cik gara drīkst būt vaigu bārda?", correct: "Līdz auss vidusdaļai, ne zemāk.", wrong: ["Līdz žokļa līnijai.", "Līdz auss apakšējai malai.", "Vaigu bārda nav atļauta vispār."] },
+            { id: 87, q: "Vai sejai jābūt gludi skūtai?", correct: "Jā, izņemot koptas ūsas vai noteikumiem atbilstošu bārdu.", wrong: ["Nē, skūties var reizi nedēļā.", "Jā, bārdas un ūsas ir pilnībā aizliegtas.", "Nav obligāti, ja strādā administratīvā amata."] },
+            { id: 88, q: "Kāda bārda ir atļauta?", correct: "Kopta un pēc iespējas īsa, lai netraucētu lietot individuālos aizsardzības līdzekļus.", wrong: ["Bieza un gara garāka par 5 cm.", "Jebkāda veida un garuma bārda.", "Tikai kazbārdiņa."] },
+            { id: 89, q: "Kādam jābūt sieviešu matu griezumam un sakārtojumam?", correct: "Tādam, lai neradītu nekārtības iespaidu. Mati nedrīkst krist pāri uzacīm vai uz pleciem.", wrong: ["Matu garumam jābūt virs ausīm.", "Atļauti tikai izlaisti mati.", "Matiem jābūt nokrāsotiem spilgtos toņos."] },
+            { id: 90, q: "Kādus matu aksesuārus sievietēm atļauts lietot?", correct: "Matadatas, matu sprādzes un saspraudes; to krāsai jābūt pieskaņotai matu krāsai.", wrong: ["Jebkurus spilgtus un dekoratīvus aksesuārus.", "Platus krāsainus matu lakatus.", "Metāla ķēdes un spīdīgus vizuļus."] },
+            { id: 91, q: "Vai matu krāsai jāatbilst dabiskam matu krāsas tonim?", correct: "Jā.", wrong: ["Nē, pieļaujamas visas krāsas.", "Nē, ja tas saskaņots ar vadību.", "Tikai vasaras periodā."] },
+            { id: 92, q: "Cik gredzenus atļauts nēsāt?", correct: "Ne vairāk kā divus; tiem jābūt neuzkrītošiem.", wrong: ["Ne vairāk kā vienu.", "Līdz četriem gredzeniem.", "Gredzenus nēsāt ir stingri aizliegts."] },
+            { id: 93, q: "Vai formas tērpa ārpusē drīkst piestiprināt rotaslietas, pulksteņķēdes, pildspalvas un zīmuļus?", correct: "Nē. Pildspalvu drīkst ievietot džempera speciāli paredzētajā kabatā.", wrong: ["Jā, uz krūšu kabatas atloka.", "Jā, ja tie ir no zelta vai sudraba.", "Jā, bez ierobežojumiem."] },
+            { id: 94, q: "Kā atļauts nēsāt reliģiska rakstura rotaslietas?", correct: "Tā, lai tās nebūtu redzamas, parasti zem formas tērpa.", wrong: ["Virs formas tērpa uz krūtīm.", "Piestiprinātas pie galvassegas.", "Tās ir stingri aizliegtas."] },
+            { id: 95, q: "Vai vīriešiem formas tērpā atļauts nēsāt auskarus?", correct: "Nē.", wrong: ["Jā, vienu maziņu auskaru kreisajā ausī.", "Jā, ja tas ir caurspīdīgs.", "Jā, brīvajā laikā starp izsaukumiem."] },
+            { id: 96, q: "Cik auskarus sieviete drīkst nēsāt?", correct: "Ne vairāk kā vienu neuzkrītošu auskaru katrā ausī.", wrong: ["Ne vairāk kā divus katrā ausī.", "Cik vēlas, ja tie nav riņķi.", "Auskarus nēsāt dienestā aizliegts."] },
+            { id: 97, q: "Vai pieļaujamas rotaslietas vai pīrsingi redzamās ķermeņa vietās?", correct: "Nē.", wrong: ["Jā, ja tie ir mazi un diskrēti.", "Jā, sejas rajonā.", "Tikai uz rokām un plaukstām."] },
+            { id: 98, q: "Vai atļauts nēsāt optiskās brilles un saulesbrilles?", correct: "Jā, ja tās pēc izskata un formas ir neuzkrītošas.", wrong: ["Nē, brilles nēsāt ir aizliegts.", "Tikai saulesbrilles vasarā.", "Jā, jebkuras spilgtas zīmolu brilles."] },
+            { id: 99, q: "Vai saulesbrilles drīkst nēsāt telpās, ierindā, stādoties priekšā vai ziņojot priekšniekam?", correct: "Nē.", wrong: ["Jā, ja ir spilgts apgaismojums.", "Jā, ja tā ir stila sastāvdaļa.", "Ar priekšnieka mutisku atļauju."] },
+            { id: 100, q: "Vai pie formas tērpa drīkst nēsāt vienkāršu tumšas krāsas dokumentu somu, rokassomu vai plecu somu?", correct: "Jā.", wrong: ["Nē, drīkst nest tikai dienesta mugursomu.", "Jā, jebkurā spilgtā krāsā.", "Tikai ar VUGD logotipu."] },
+            { id: 101, q: "Vai IeM izglītības iestāžu izglītojamajiem pie formas tērpa atļauts nest tumšas krāsas mugursomu?", correct: "Jā.", wrong: ["Nē, somas ir aizliegtas.", "Tikai sporta somu.", "Jā, bet tikai izbraukuma mācībās."] },
+            { id: 102, q: "Vai pie ikdienas un parādes formas tērpa drīkst nēsāt tumšas krāsas lietussargu?", correct: "Jā.", wrong: ["Nē, pie parādes formas lietussargu nenēsā.", "Tikai caurspīdīgu lietussargu.", "Nē, dienesta laikā lietussargi nav atļauti."] },
+            { id: 103, q: "Kādas drīkst būt ūsas?", correct: "Koptas un tādas, kas nepārklāj augšlūpu.", wrong: ["Jebkura garuma un formas.", "Tādas, kas nosedz apakšlūpu.", "Ūsas ir aizliegtas."] },
+            { id: 104, q: "Kā amatpersonu sapulcēšanās vietā sveicina tiešo vai augstāku priekšnieku?", correct: "Atkarībā no situācijas dod komandu “Mierā!” vai “Virsnieki!”. Pārējie pieceļas un ieņem pamatstāju.", wrong: ["Visi skaļi sauc “Labdien!” un apsēžas.", "Dod komandu “Brīvi!” un turpina sarunas.", "Pieiet pie priekšnieka un paspiež roku."] }
+        ];
+
+        let currentQuizQuestions = [];
+        let currentIndex = 0;
+        let scoreCorrect = 0;
+        let scoreIncorrect = 0;
+        let selectedOptionIndex = null;
+        let activeMode = 'all';
+
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startQuiz(mode) {
+            activeMode = mode;
+            let rawList = [];
+
+            if (mode === 'express') {
+                rawList = shuffleArray(questionsDB).slice(0, 20);
+                document.getElementById('quiz-mode-badge').innerText = "Ekspress tests (20)";
+            } else if (mode === 'rules') {
+                rawList = questionsDB.filter(q => q.id >= 46);
+                document.getElementById('quiz-mode-badge').innerText = "Dienesta attiecības";
+            } else {
+                rawList = [...questionsDB];
+                document.getElementById('quiz-mode-badge').innerText = "Pilnais tests (104)";
+            }
+
+            currentQuizQuestions = shuffleArray(rawList).map(q => {
+                const options = [
+                    { text: q.correct, isCorrect: true },
+                    ...q.wrong.map(w => ({ text: w, isCorrect: false }))
+                ];
+                return {
+                    originalId: q.id,
+                    questionText: q.q,
+                    options: shuffleArray(options),
+                    correctAnswerText: q.correct
+                };
+            });
+
+            currentIndex = 0;
+            scoreCorrect = 0;
+            scoreIncorrect = 0;
+
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('quiz-screen').classList.add('flex');
+            document.getElementById('quiz-mode-badge').classList.remove('hidden');
+
+            updateStats();
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const qData = currentQuizQuestions[currentIndex];
+            selectedOptionIndex = null;
+
+            document.getElementById('question-number-badge').innerText = `Jautājums #${qData.originalId}`;
+            document.getElementById('question-text').innerText = qData.questionText;
+
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.className = "hidden p-4 rounded-xl text-sm font-medium border mb-4";
+            document.getElementById('next-btn').disabled = true;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn w-full p-4 text-left border-2 border-slate-200 hover:border-slate-400 rounded-xl bg-slate-50 font-medium text-slate-800 flex justify-between items-center transition";
+                btn.onclick = () => handleSelectOption(idx);
+                btn.id = `opt-btn-${idx}`;
+
+                btn.innerHTML = `
+                    <span class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center flex-shrink-0">
+                            ${String.fromCharCode(65 + idx)}
+                        </span>
+                        <span>${escapeHtml(opt.text)}</span>
+                    </span>
+                    <span class="status-icon text-lg"></span>
+                `;
+
+                container.appendChild(btn);
+            });
+
+            updateProgress();
+        }
+
+        function handleSelectOption(optIndex) {
+            if (selectedOptionIndex !== null) return;
+            selectedOptionIndex = optIndex;
+
+            const qData = currentQuizQuestions[currentIndex];
+            const selectedOpt = qData.options[optIndex];
+            const isCorrect = selectedOpt.isCorrect;
+
+            qData.options.forEach((_, idx) => {
+                const btn = document.getElementById(`opt-btn-${idx}`);
+                btn.disabled = true;
+                btn.classList.remove('hover:border-slate-400');
+            });
+
+            qData.options.forEach((opt, idx) => {
+                const btn = document.getElementById(`opt-btn-${idx}`);
+                if (opt.isCorrect) {
+                    btn.classList.remove('bg-slate-50', 'border-slate-200');
+                    btn.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-900');
+                    btn.querySelector('.status-icon').innerText = '✅';
+                } else if (idx === optIndex && !isCorrect) {
+                    btn.classList.remove('bg-slate-50', 'border-slate-200');
+                    btn.classList.add('bg-rose-50', 'border-rose-500', 'text-rose-900');
+                    btn.querySelector('.status-icon').innerText = '❌';
+                }
+            });
+
+            const feedbackBox = document.getElementById('feedback-box');
+            const feedbackStatus = document.getElementById('feedback-status');
+            const feedbackText = document.getElementById('feedback-text');
+
+            feedbackBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                scoreCorrect++;
+                feedbackBox.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-800');
+                feedbackStatus.innerText = "Pareizi! 🎉";
+                feedbackText.innerText = "Jūsu atbilde ir precīza.";
+            } else {
+                scoreIncorrect++;
+                feedbackBox.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-800');
+                feedbackStatus.innerText = "Nepareizi ❌";
+                feedbackText.innerText = `Pareizā atbilde: "${qData.correctAnswerText}"`;
+            }
+
+            updateStats();
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        function nextQuestion() {
+            if (currentIndex < currentQuizQuestions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function updateProgress() {
+            const total = currentQuizQuestions.length;
+            const current = currentIndex + 1;
+            const pct = Math.round((current / total) * 100);
+
+            document.getElementById('progress-text').innerText = `Jautājums ${current} no ${total}`;
+            document.getElementById('progress-percent').innerText = `${pct}%`;
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+        }
+
+        function updateStats() {
+            document.getElementById('score-correct').innerText = `Pareizi: ${scoreCorrect}`;
+            document.getElementById('score-incorrect').innerText = `Nepareizi: ${scoreIncorrect}`;
+        }
+
+        function showResults() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('flex');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            const total = currentQuizQuestions.length;
+            const percentage = Math.round((scoreCorrect / total) * 100);
+
+            document.getElementById('result-percentage').innerText = `${percentage}%`;
+            document.getElementById('result-counts').innerText = `${scoreCorrect} pareizi no ${total} jautājumiem`;
+
+            const badge = document.getElementById('result-pass-badge');
+            const title = document.getElementById('result-title');
+            const icon = document.getElementById('result-icon');
+
+            if (percentage >= 80) {
+                badge.className = "inline-block px-4 py-1.5 rounded-full text-sm font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
+                badge.innerText = "IESKAITĪTS (Vismaz 80%)";
+                title.innerText = "Apsveicam! Pārbaudījums nokārtots!";
+                icon.innerText = "🏆";
+            } else {
+                badge.className = "inline-block px-4 py-1.5 rounded-full text-sm font-bold bg-rose-100 text-rose-800 border border-rose-300";
+                badge.innerText = "NEIESKAITĪTS (Zem 80%)";
+                title.innerText = "Pārbaudījums nav nokārtots";
+                icon.innerText = "📖";
+            }
+        }
+
+        function restartCurrentQuiz() { startQuiz(activeMode); }
+
+        function showStartScreen() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('flex');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+            document.getElementById('quiz-mode-badge').classList.add('hidden');
+        }
+
+        function confirmExit() {
+            if (confirm("Vai tiešām vēlaties pārtraukt pašreizējo testu?")) showStartScreen();
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
