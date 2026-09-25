@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="lv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c37">
+  <meta name="description" content="Interaktīvs pašpārbaudes tests par sabiedrību, darba drošību, veselību un vidi.">
+  <title>Sabiedrība un drošība — tests</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#17323b;background:#f2f6f6}*{box-sizing:border-box}body{margin:0}header{background:#102c37;color:white;padding:22px max(22px,calc((100vw - 920px)/2))}header h1{font-size:clamp(24px,4vw,36px);margin:0 0 6px}header p{margin:0;color:#b9d5d9}main{max-width:920px;margin:auto;padding:22px 18px 64px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px;font-weight:650}.progress{height:9px;background:#d7e4e6;border-radius:20px;overflow:hidden;margin-bottom:24px}.progress span{display:block;height:100%;background:#168b83;transition:width .2s}.card{background:white;border:1px solid #d9e6e7;border-radius:18px;padding:clamp(20px,4vw,36px);box-shadow:0 12px 32px #0b30310a}.topic{color:#17766f;font-size:14px;font-weight:750;text-transform:uppercase;letter-spacing:.08em}.card h2{line-height:1.3;font-size:clamp(21px,3vw,29px);margin:12px 0 25px}.answers{display:grid;gap:11px}.answer{font:inherit;font-size:17px;line-height:1.35;text-align:left;padding:16px 18px;border:1.5px solid #cddddd;border-radius:12px;background:#fff;color:#17323b;cursor:pointer;min-height:58px}.answer:hover:not(:disabled),.answer:focus-visible{border-color:#168b83;background:#f0faf8;outline:none}.answer:disabled{cursor:default}.answer.correct{border-color:#14845e;background:#e6f7ee}.answer.wrong{border-color:#cb594b;background:#fff0ed}.feedback{margin-top:20px;font-weight:650;min-height:26px}.feedback.good{color:#126545}.feedback.bad{color:#a23628}.actions{margin-top:18px;display:flex;justify-content:flex-end}.primary{font:inherit;font-weight:700;color:white;background:#126e70;border:0;border-radius:10px;padding:14px 23px;cursor:pointer}.primary:hover{background:#0d5557}.primary:focus-visible{outline:3px solid #6accc1;outline-offset:3px}.small{color:#526e73;font-size:14px}.result{text-align:center}.result .score{font-size:clamp(48px,8vw,76px);font-weight:800;color:#126e70;margin:8px 0}.result p{font-size:18px}.result .primary{margin-top:15px}@media(max-width:500px){.top{font-size:14px}.answer{font-size:16px}header{padding:22px 18px}}
+  </style>
+</head>
+<body>
+<header><h1>Sabiedrība un drošība</h1><p>Pašpārbaudes tests · četri atbilžu varianti</p></header>
+<main><div class="top"><span id="counter"></span><span id="points"></span></div><div class="progress"><span id="progress"></span></div><section class="card" id="card" aria-live="polite"></section></main>
+<script>
+const questions=[
+  ['Darba drošība','Ar kādu slodzi un cik ilgi pārbauda šļūteņu turētāju?','200 kg 5 minūtes','100 kg 5 minūtes','200 kg 2 minūtes','60 kg 2 minūtes'],
+  ['Darba drošība','Vai elektroiekārtas drīkst dzēst ar ūdeni?','Nedrīkst','Drīkst vienmēr','Drīkst, ja ūdens ir auksts','Drīkst tikai nelielus ugunsgrēkus'],
+  ['Darba drošība','Kāds ir norādītais attālums starp amatpersonām, iedarbinot zāģi?','2 m','1 m','3 m','5 m'],
+  ['Darba drošība','No kāda augstuma sākas darbs augstumā?','No 1,5 m','No 1 m','No 2 m','No 3 m'],
+  ['Darba drošība','Cik cilvēku vismaz nepieciešami darbam ar stobru augstumā?','2 personas','1 persona','3 personas','4 personas'],
+  ['Darba drošība','Vai darbinieks drīkst viens pats veikt darbu riska zonā?','Nē, vienam to darīt ir aizliegts','Jā, jebkurā gadījumā','Jā, ja darbs ilgst mazāk par 5 minūtēm','Jā, ja viņš ir pieredzējis'],
+  ['Aprīkojuma pārbaude','Kā pēc tavām piezīmēm pārbauda trīsposmu izbīdāmās kāpnes?','Uz katra posma 100 kg; 75° leņķis; 2,8 m augstums','Uz katra posma 60 kg; 75° leņķis; 2,8 m augstums','Uz katra posma 100 kg; 45° leņķis; 2,8 m augstums','Uz katra posma 100 kg; 75° leņķis; 1,5 m augstums'],
+  ['Darba aizsardzība','Kas ir darba aizsardzība?','Pasākumu kopums, kas nodrošina drošību un veselību darbā','Tikai individuālo aizsardzības līdzekļu lietošana','Tikai ugunsdzēsības aprīkojuma pārbaude','Darba laika uzskaite'],
+  ['Aprīkojuma pārbaude','Kāds ir apaļās konstrukcijas diametrs, ap kuru apliek ugunsdzēsēja jostu?','300 mm','100 mm','200 mm','500 mm'],
+  ['Darba aizsardzība','Cik bieži notiek instruktāža bīstamiem darbiem?','Reizi pusgadā','Reizi mēnesī','Reizi gadā','Reizi trijos gados'],
+  ['Darba aizsardzība','Kurš ir atbildīgs par darba aizsardzību ugunsgrēka laikā?','Glābšanas darbu vadītājs','Jebkurš garāmgājējs','Tikai objekta īpašnieks','Tikai dispečers'],
+  ['Darba drošība','Kad ir atļauts atrasties uz apledojoša jumta?','Ja lieto atbilstošus drošības līdzekļus','Vienmēr','Ja darbs ilgst mazāk par 5 minūtēm','Ja jumts ir lēzens'],
+  ['Aprīkojuma pārbaude','Cik liels drīkst būt virves izstiepums pēc pārbaudes?','Ne vairāk kā 5 %','Ne vairāk kā 2 %','Ne vairāk kā 10 %','Ne vairāk kā 20 %'],
+  ['Aprīkojuma pārbaude','Ar kādu slodzi un cik ilgi pārbauda bomjākāpnes?','60 kg katrā pusē 2 minūtes','100 kg katrā pusē 5 minūtes','60 kg kopā 5 minūtes','200 kg vienā pusē 2 minūtes'],
+  ['Aprīkojuma pārbaude','Kas jādara ar drošības spilveniem pirms katras lietošanas?','Jāuzirdina','Jāsamitrina','Jāsaspiež','Jānokrāso'],
+  ['Aprīkojuma pārbaude','No kā veido drošības spilvenu?','No smiltīm un skaidām attiecībā 1:1','Tikai no smiltīm','No smiltīm un ūdens attiecībā 1:1','Tikai no skaidām'],
+  ['Veselība','Ar ko tavās piezīmēs saistīta sabiedrības veselība?','Ar veselību un profilaktiskiem pasākumiem','Tikai ar ārstēšanu slimnīcā','Tikai ar sporta sacensībām','Tikai ar darba vietas drošību'],
+  ['Veselība','Kuri divi jēdzieni tavās piezīmēs saistīti ar veselīgu dzīvesveidu?','Aktivitāte un stabilitāte','Mazkustīgums un izolācija','Uztura bagātinātāji un slodze','Atpūta un bezdarbība'],
+  ['Veselība','Kas palīdz līdzsvarot darbu un mājas dzīvi un pozitīvi ietekmē fizisko veselību?','Stresa pārvaldīšana, aktivitāte un sadarbība','Tikai garākas darba stundas','Miega samazināšana','Atteikšanās no atpūtas'],
+  ['Veselība','Kādi aspekti pierakstā saistīti ar psihisko veselību?','Veselība un pašrūpe, trauksme un depresija','Tikai muskuļu spēks','Tikai uzturs','Tikai asinsspiediens'],
+  ['Veselība','Kā var izpausties garīgā pārslodze?','Kā nogurums','Kā palielināta redzes asuma sajūta','Kā garantēts enerģijas pieaugums','Tā nevar izpausties fiziski'],
+  ['Veselība','Cik stundu miega minēts pierakstā?','7–9 stundas','3–4 stundas','5–6 stundas','11–13 stundas'],
+  ['Veselība','Kuri piemēri minēti kā atkarība no procesiem?','Ēšana un iepirkšanās','Smēķēšana un alkohols','Tikai medikamentu lietošana','Tikai sociālie tīkli'],
+  ['Vide','Kas ir vides aizsardzība?','Pasākumu kopums vides saglabāšanai un aizsardzībai','Tikai atkritumu izvešana','Tikai mežu stādīšana','Tikai ūdens attīrīšana'],
+  ['Vide','Kam, pēc pieraksta, pieder vides tiesības?','Publiskajam sektoram','Tikai uzņēmumiem','Tikai privātpersonām','Tikai pašvaldību darbiniekiem']
+];
+let order=[],index=0,score=0,answered=false;
+const $=id=>document.getElementById(id);
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function start(){order=shuffle(questions);index=0;score=0;render()}
+function render(){answered=false;const q=order[index];$('counter').textContent=`Jautājums ${index+1} no ${order.length}`;$('points').textContent=`Pareizi: ${score}`;$('progress').style.width=`${index/order.length*100}%`;const card=$('card');card.innerHTML='';let topic=document.createElement('div');topic.className='topic';topic.textContent=q[0];let heading=document.createElement('h2');heading.textContent=q[1];let answers=document.createElement('div');answers.className='answers';shuffle(q.slice(2)).forEach(v=>{let b=document.createElement('button');b.className='answer';b.type='button';b.textContent=v;b.onclick=()=>choose(b,v,q[2]);answers.append(b)});let feedback=document.createElement('div');feedback.className='feedback';feedback.id='feedback';let actions=document.createElement('div');actions.className='actions';actions.id='actions';card.append(topic,heading,answers,feedback,actions)}
+function choose(button,value,correct){if(answered)return;answered=true;const good=value===correct;if(good)score++;document.querySelectorAll('.answer').forEach(b=>{b.disabled=true;if(b.textContent===correct)b.classList.add('correct')});if(!good)button.classList.add('wrong');$('points').textContent=`Pareizi: ${score}`;const f=$('feedback');f.classList.add(good?'good':'bad');f.textContent=good?'Pareizi!':`Nepareizi. Pareizā atbilde: ${correct}`;let next=document.createElement('button');next.className='primary';next.textContent=index===order.length-1?'Skatīt rezultātu':'Nākamais jautājums';next.onclick=()=>{index++;if(index<order.length)render();else result()};$('actions').append(next);next.focus()}
+function result(){$('counter').textContent='Tests pabeigts';$('points').textContent='';$('progress').style.width='100%';$('card').innerHTML=`<div class="result"><div class="topic">Rezultāts</div><div class="score">${score} / ${order.length}</div><p>Pareizas atbildes: ${Math.round(score/order.length*100)} %</p><p class="small">Jautājumu secība nākamajā reizē mainīsies.</p><button class="primary" id="retry">Mēģināt vēlreiz</button></div>`;$('retry').onclick=start}
+start();
+</script>
+</body>
+</html>
